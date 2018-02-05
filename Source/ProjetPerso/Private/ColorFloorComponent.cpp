@@ -16,20 +16,23 @@ UColorFloorComponent::UColorFloorComponent()
 
 void UColorFloorComponent::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpule, const FHitResult & Hit)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Hit!"));
+
+	floorMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
+
+	//floorMesh->GetMaterial(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(1.0f, 0.0f, 1.0f));
+
+	auto material = UMaterialInstanceDynamic::Create(floorMesh->GetMaterial(0), NULL);
+	material->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0.5f, 0.0f, 0.5f));
+	floorMesh->SetMaterial(0, material);
+
+	//lastOwnerIndex = (ThirdPersonCharacter_C*)OtherActor->
 }
 
 // Called when the game starts
 void UColorFloorComponent::BeginPlay()
 {
-	Super::BeginPlay();
-	floorMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
-
-	//floorMesh->GetMaterial(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(1.0f, 0.0f, 1.0f));
-	
-	auto material = UMaterialInstanceDynamic::Create(floorMesh->GetMaterial(0), NULL);
-	material->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(1.0f, 0.0f, 1.0f));
-	floorMesh->SetMaterial(0, material);
-	
+	Super::BeginPlay();	
 }
 
 

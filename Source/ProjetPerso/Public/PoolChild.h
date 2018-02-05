@@ -4,24 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ColorFloorComponent.generated.h"
+#include "PoolChild.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PROJETPERSO_API UColorFloorComponent : public UActorComponent
+class PROJETPERSO_API UPoolChild : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UColorFloorComponent();
-
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpule, const FHitResult& Hit);
-
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* floorMesh = nullptr;
-	int lastOwnerIndex = -1;
+	UPoolChild();
 
 protected:
 	// Called when the game starts
@@ -31,6 +24,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	
+		
 	
 };

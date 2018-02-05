@@ -4,24 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ColorFloorComponent.generated.h"
+#include "PlayerIndexAssigner.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PROJETPERSO_API UColorFloorComponent : public UActorComponent
+class PROJETPERSO_API UPlayerIndexAssigner : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UColorFloorComponent();
+	UPlayerIndexAssigner();
 
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpule, const FHitResult& Hit);
-
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* floorMesh = nullptr;
-	int lastOwnerIndex = -1;
+	UPROPERTY(BlueprintReadWrite)
+	int playerIndex;
 
 protected:
 	// Called when the game starts
@@ -31,6 +27,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	
+		
 	
 };
