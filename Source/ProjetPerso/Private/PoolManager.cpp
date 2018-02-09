@@ -37,6 +37,7 @@ void UPoolManager::BeginPlay()
 		FActorSpawnParameters spawnParam;
 		spawnParam.Name = GetPoolNameAsString(leader.m_poolName);
 		AEmptyActor* poolParent = GetWorld()->SpawnActor<AEmptyActor>(AEmptyActor::StaticClass(), GetOwner()->GetActorLocation(), FRotator::ZeroRotator, spawnParam);
+		poolParent->Rename(*(GetPoolNameAsString(leader.m_poolName).ToString()));
 		poolParent->SetActorLabel(*(GetPoolNameAsString(leader.m_poolName).ToString()));
 
 		FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
