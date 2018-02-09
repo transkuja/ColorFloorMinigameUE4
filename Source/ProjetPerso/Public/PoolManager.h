@@ -26,8 +26,8 @@ public:
 	TArray<AActor*> ItemPool() { return m_itemPool; }
 };
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class PROJETPERSO_API UPoolLeader : public UObject
+USTRUCT(BlueprintType)
+struct PROJETPERSO_API FPoolLeader
 {
 	GENERATED_BODY()
 	TArray<Pool*> m_subPools;
@@ -49,7 +49,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float m_timerReturnToPool = -1;
 
-	UPoolLeader() { }
+	FPoolLeader() { }
 
 	inline TArray<Pool*> SubPools() { return m_subPools; }
 
@@ -69,12 +69,12 @@ public:
 	UPoolManager();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<UPoolLeader*> m_poolLeaders;
+	TArray<FPoolLeader> m_poolLeaders;
 	//UPROPERTY(EditAnywhere)
 	//	TArray<int> test;
 	//UPROPERTY(EditAnywhere)
 	//	float test2;
-	UPoolLeader* GetPoolByName(PoolName _poolName);
+	FPoolLeader GetPoolByName(PoolName _poolName);
 
 protected:
 	// Called when the game starts

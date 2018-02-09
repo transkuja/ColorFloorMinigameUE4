@@ -11,7 +11,7 @@ UPoolManager::UPoolManager()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	// ...	
 }
 
 FName GetPoolNameAsString(PoolName EnumValue)
@@ -35,27 +35,27 @@ void UPoolManager::BeginPlay()
 	for (auto leader : m_poolLeaders)
 	{
 		FActorSpawnParameters spawnParam;
-		spawnParam.Name = GetPoolNameAsString(leader->m_poolName);
+		spawnParam.Name = GetPoolNameAsString(leader.m_poolName);
 		AEmptyActor* poolParent = GetWorld()->SpawnActor<AEmptyActor>(GetClass(), GetOwner()->GetActorLocation(), FRotator::ZeroRotator, spawnParam);
 
 			//&FVector(0,0,0));
 		//AActor::AttachRootComponentToActor
 		//poolParent.transform.SetParent(transform);
 		//leader->PoolParent = poolParent.transform;
-		leader->InitializePool();
+		leader.InitializePool();
 	}
 	// ...
 	
 }
 
-UPoolLeader* UPoolManager::GetPoolByName(PoolName _poolName)
+FPoolLeader UPoolManager::GetPoolByName(PoolName _poolName)
 {
 	for (auto leader : m_poolLeaders)
 	{
-		if (leader->m_poolName == _poolName)
+		if (leader.m_poolName == _poolName)
 			return leader;
 	}
-	return nullptr;
+	return FPoolLeader();
 }
 
 // Called every frame
@@ -71,21 +71,21 @@ Pool::~Pool()
 	delete m_poolParent;
 }
 
-AActor* UPoolLeader::GetItem(bool _activeObjectOnRetrieval, int _subpoolNumber)
+AActor* FPoolLeader::GetItem(bool _activeObjectOnRetrieval, int _subpoolNumber)
 {
 	return nullptr;
 }
 
-AActor* UPoolLeader::GetItem(AActor * _newParent, FVector _newPosition, bool _activeObjectOnRetrieval, bool _spawnInWorldspace, int _subpoolNumber)
+AActor* FPoolLeader::GetItem(AActor * _newParent, FVector _newPosition, bool _activeObjectOnRetrieval, bool _spawnInWorldspace, int _subpoolNumber)
 {
 	return nullptr;
 }
 
-void UPoolLeader::InitializePool()
+void FPoolLeader::InitializePool()
 {
 }
 
-AActor* UPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
+AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 {
 	return nullptr;
 }
