@@ -26,7 +26,7 @@ public:
 	TArray<AActor*> ItemPool() { return m_itemPool; }
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct PROJETPERSO_API FPoolLeader
 {
 	GENERATED_BODY()
@@ -36,15 +36,21 @@ protected:
 	AActor* m_poolParent;
 
 public:
+	UPROPERTY(EditAnywhere)
 	PoolName m_poolName;
+	UPROPERTY(EditAnywhere)
 	int m_poolSize = 50;
+	UPROPERTY(EditAnywhere)
 	TArray<AActor*> m_spawnableBlueprints;
+	UPROPERTY(EditAnywhere)
 	bool m_separateSpawnablesIntoDifferentPools = false;
+	UPROPERTY(EditAnywhere)
 	float m_timerReturnToPool = -1;
 
 	FPoolLeader() { }
 
 	inline TArray<Pool*> SubPools() { return m_subPools; }
+	inline void SetPoolParent(AActor* _poolParent) { m_poolParent = _poolParent; }
 
 	AActor* GetItem(bool _activeObjectOnRetrieval = false, int _subpoolNumber = 0);
 	AActor* GetItem(AActor* _newParent, FVector _newPosition, bool _activeObjectOnRetrieval = false, bool _spawnInWorldspace = false, int _subpoolNumber = 0);

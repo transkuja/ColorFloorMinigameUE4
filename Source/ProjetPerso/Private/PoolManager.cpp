@@ -36,12 +36,12 @@ void UPoolManager::BeginPlay()
 	{
 		FActorSpawnParameters spawnParam;
 		spawnParam.Name = GetPoolNameAsString(leader.m_poolName);
-		AEmptyActor* poolParent = GetWorld()->SpawnActor<AEmptyActor>(GetClass(), GetOwner()->GetActorLocation(), FRotator::ZeroRotator, spawnParam);
+		AEmptyActor* poolParent = GetWorld()->SpawnActor<AEmptyActor>(AEmptyActor::StaticClass(), GetOwner()->GetActorLocation(), FRotator::ZeroRotator, spawnParam);
+		poolParent->SetActorLabel(*(GetPoolNameAsString(leader.m_poolName).ToString()));
 
-			//&FVector(0,0,0));
-		//AActor::AttachRootComponentToActor
-		//poolParent.transform.SetParent(transform);
-		//leader->PoolParent = poolParent.transform;
+		FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
+		poolParent->AttachToActor(GetOwner(), rules);
+		leader.SetPoolParent(poolParent);
 		leader.InitializePool();
 	}
 	// ...
