@@ -26,27 +26,20 @@ public:
 	TArray<AActor*> ItemPool() { return m_itemPool; }
 };
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct PROJETPERSO_API FPoolLeader
 {
 	GENERATED_BODY()
 	TArray<Pool*> m_subPools;
 
 protected:
-	UPROPERTY(EditDefaultsOnly)
-	int m_poolSize = 50;
-	
+	AActor* m_poolParent;
 
 public:
-	UPROPERTY(EditAnywhere)
 	PoolName m_poolName;
-	UPROPERTY(EditAnywhere)
-	AActor* m_poolParent;
-	UPROPERTY(EditAnywhere)
+	int m_poolSize = 50;
 	TArray<AActor*> m_spawnableBlueprints;
-	UPROPERTY(EditAnywhere)
 	bool m_separateSpawnablesIntoDifferentPools = false;
-	UPROPERTY(EditAnywhere)
 	float m_timerReturnToPool = -1;
 
 	FPoolLeader() { }

@@ -83,6 +83,7 @@ AActor* FPoolLeader::GetItem(AActor * _newParent, FVector _newPosition, bool _ac
 
 void FPoolLeader::InitializePool()
 {
+
 }
 
 AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
