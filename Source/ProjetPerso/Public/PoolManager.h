@@ -31,6 +31,7 @@ struct PROJETPERSO_API FPoolLeader
 {
 	GENERATED_BODY()
 	TArray<Pool*> m_subPools;
+	UWorld* m_worldRef;
 
 protected:
 	AActor* m_poolParent;
@@ -51,6 +52,7 @@ public:
 
 	inline TArray<Pool*> SubPools() { return m_subPools; }
 	inline void SetPoolParent(AActor* _poolParent) { m_poolParent = _poolParent; }
+	inline void SetWorld(UWorld* _worldRef) { m_worldRef = _worldRef; }
 
 	AActor* GetItem(bool _activeObjectOnRetrieval = false, int _subpoolNumber = 0);
 	AActor* GetItem(AActor* _newParent, FVector _newPosition, bool _activeObjectOnRetrieval = false, bool _spawnInWorldspace = false, int _subpoolNumber = 0);

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PoolManager.h"
+#include "PoolChild.h"
 
 class AEmptyActor;
 
@@ -36,13 +37,14 @@ void UPoolManager::BeginPlay()
 	{
 		FActorSpawnParameters spawnParam;
 		spawnParam.Name = GetPoolNameAsString(leader.m_poolName);
-		AEmptyActor* poolParent = GetWorld()->SpawnActor<AEmptyActor>(AEmptyActor::StaticClass(), GetOwner()->GetActorLocation(), FRotator::ZeroRotator, spawnParam);
+		AEmptyActor* poolParent = GetWorld()->SpawnActor<AEmptyActor>(AEmptyActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
 		poolParent->Rename(*(GetPoolNameAsString(leader.m_poolName).ToString()));
 		poolParent->SetActorLabel(*(GetPoolNameAsString(leader.m_poolName).ToString()));
 
 		FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
 		poolParent->AttachToActor(GetOwner(), rules);
 		leader.SetPoolParent(poolParent);
+		leader.SetWorld(GetWorld());
 		leader.InitializePool();
 	}
 	// ...
@@ -84,10 +86,115 @@ AActor* FPoolLeader::GetItem(AActor * _newParent, FVector _newPosition, bool _ac
 
 void FPoolLeader::InitializePool()
 {
+	if (m_spawnableBlueprints.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cannot initialize pool %s because no blueprints are linked."), *GetNameSafe(m_poolParent));
+		return;
+	}
 
+	if (m_poolSize <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cannot initialize pool because pool size is null or negative."));
+		return;
+	}
+
+	TArray<AActor*> children;
+	for (int i = 0; i < ((m_separateSpawnablesIntoDifferentPools) ? m_spawnableBlueprints.Num() : 1); i++)
+	{
+		m_poolParent->GetAttachedActors(children);
+		AEmptyActor* poolContainer = NULL;
+
+		if (children.Num() <= i)
+		{
+			if (m_worldRef == NULL)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Woops"));
+				return;
+			}
+
+			poolContainer = m_worldRef->SpawnActor<AEmptyActor>(AEmptyActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
+			FString poolContainerName = FString("Pool Container ");
+			poolContainerName.AppendInt(i);
+			poolContainer->Rename(*poolContainerName);
+			poolContainer->SetActorLabel(*poolContainerName);
+
+			FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
+			poolContainer->AttachToActor(m_poolParent, rules);
+		}
+
+		if (poolContainer == NULL)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Null pool container, retrieve it from children..."));
+			m_poolParent->GetAttachedActors(children);
+			poolContainer = (AEmptyActor*)children[i];
+
+			if (poolContainer == NULL)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Still null pool container, no pool for you."));
+				return;
+			}
+		}
+
+		Pool* newPool = new Pool(poolContainer, m_timerReturnToPool);
+		if (newPool == NULL)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Fail to create pool."));
+			return;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Pool created."));
+
+		SubPools().Emplace(newPool);
+		UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
+
+		for (int j = 0; j < m_poolSize / ((m_separateSpawnablesIntoDifferentPools) ? m_spawnableBlueprints.Num() : 1); j++)
+		{
+			CreateRandomPoolItem(i);
+		}
+	}
 }
 
 AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 {
-	return nullptr;
+	int blueprintIndex = (m_separateSpawnablesIntoDifferentPools) ? _subpoolIndex : rand()% m_spawnableBlueprints.Num();
+	UE_LOG(LogTemp, Warning, TEXT("Index %d"), blueprintIndex);
+	if (m_spawnableBlueprints[blueprintIndex] == nullptr)
+		UE_LOG(LogTemp, Warning, TEXT("nullptr"));
+
+	AActor* item = m_worldRef->SpawnActor<AActor>(m_spawnableBlueprints[blueprintIndex]->GetClass(), FVector::ZeroVector, FRotator::ZeroRotator);
+	if (item == nullptr)
+		UE_LOG(LogTemp, Warning, TEXT("nullptr item"));
+
+	TArray<AActor*> children;
+	m_poolParent->GetAttachedActors(children);
+	FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
+	item->AttachToActor(children[_subpoolIndex], rules);
+
+	// Check this later
+	// UPoolChild* poolChildComponent = item->CreateDefaultSubobject<UPoolChild>(TEXT("PoolChild")); // Only use this in constructors
+
+	/*
+	UPoolChild* poolChildComponent = ConstructObject<UPoolChild>(UPoolChild::StaticClass(), item, TEXT("PoolChild"));
+
+	poolChildComponent->RegisterComponent();
+	poolChildComponent->OnComponentCreated(); // Might need this line, might not.
+	poolChildComponent->AttachTo(item->GetRootComponent(), NAME_None);
+	*/
+
+	UStaticMeshComponent* staticMesh = item->FindComponentByClass<UStaticMeshComponent>();
+	
+	if (staticMesh == NULL)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No static mesh attached to blueprint."));
+		return nullptr;
+	}
+
+	staticMesh->SetVisibility(false);
+	staticMesh->SetCollisionProfileName(FName("NoCollision"));
+
+	//item.AddComponent<PoolChild>().Pool = SubPools[_subpoolIndex];
+	UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
+
+	//SubPools()[_subpoolIndex]->ItemPool().Emplace(item);
+
+	return item;
 }
