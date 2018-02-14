@@ -164,6 +164,17 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 	if (item == nullptr)
 		UE_LOG(LogTemp, Warning, TEXT("nullptr item"));
 
+	UStaticMeshComponent* staticMesh = item->FindComponentByClass<UStaticMeshComponent>();
+	if (staticMesh == NULL)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No static mesh attached to blueprint."));
+		return nullptr;
+	}
+
+	staticMesh->SetVisibility(false);
+	staticMesh->SetCollisionProfileName(FName("NoCollision"));
+	staticMesh->SetMobility(EComponentMobility::Movable);
+
 	TArray<AActor*> children;
 	m_poolParent->GetAttachedActors(children);
 	FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
@@ -179,17 +190,6 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 	poolChildComponent->OnComponentCreated(); // Might need this line, might not.
 	poolChildComponent->AttachTo(item->GetRootComponent(), NAME_None);
 	*/
-
-	UStaticMeshComponent* staticMesh = item->FindComponentByClass<UStaticMeshComponent>();
-	
-	if (staticMesh == NULL)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No static mesh attached to blueprint."));
-		return nullptr;
-	}
-
-	staticMesh->SetVisibility(false);
-	staticMesh->SetCollisionProfileName(FName("NoCollision"));
 
 	//item.AddComponent<PoolChild>().Pool = SubPools[_subpoolIndex];
 	UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
