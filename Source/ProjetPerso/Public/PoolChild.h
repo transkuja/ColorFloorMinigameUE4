@@ -12,9 +12,20 @@ class PROJETPERSO_API UPoolChild : public UActorComponent
 {
 	GENERATED_BODY()
 
+private:
+	Pool* m_pool;
+	float m_currentTimer = 0.0f;
+	bool m_noReturn = false;
+	bool m_isReady = false;
+
 public:	
 	// Sets default values for this component's properties
 	UPoolChild();
+	inline void SetPool(Pool* _pool) { 
+		m_pool = _pool;
+		m_currentTimer = m_pool->m_timerReturnToPool;
+		m_isReady = true;
+	}
 
 protected:
 	// Called when the game starts

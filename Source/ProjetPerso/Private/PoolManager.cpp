@@ -179,6 +179,7 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 	m_poolParent->GetAttachedActors(children);
 	FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
 	item->AttachToActor(children[_subpoolIndex], rules);
+	item->FindComponentByClass<UPoolChild>()->SetPool(SubPools(_subpoolIndex));
 
 	// Check this later
 	// UPoolChild* poolChildComponent = item->CreateDefaultSubobject<UPoolChild>(TEXT("PoolChild")); // Only use this in constructors
@@ -191,7 +192,6 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 	poolChildComponent->AttachTo(item->GetRootComponent(), NAME_None);
 	*/
 
-	//item.AddComponent<PoolChild>().Pool = SubPools[_subpoolIndex];
 	//UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
 
 	SubPools(_subpoolIndex)->ItemPool()->Emplace(item);
