@@ -143,8 +143,8 @@ void FPoolLeader::InitializePool()
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Pool created."));
 
-		SubPools().Emplace(newPool);
-		UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
+		SubPools()->Emplace(new Pool(poolContainer, m_timerReturnToPool));
+		UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools()->Num());
 
 		for (int j = 0; j < m_poolSize / ((m_separateSpawnablesIntoDifferentPools) ? m_spawnableBlueprints.Num() : 1); j++)
 		{
@@ -192,9 +192,9 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 	*/
 
 	//item.AddComponent<PoolChild>().Pool = SubPools[_subpoolIndex];
-	UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
+	//UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
 
-	//SubPools()[_subpoolIndex]->ItemPool().Emplace(item);
+	SubPools(_subpoolIndex)->ItemPool()->Emplace(item);
 
 	return item;
 }

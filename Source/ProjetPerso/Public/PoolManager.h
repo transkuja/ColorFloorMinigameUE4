@@ -23,7 +23,7 @@ public:
 
 	Pool(AActor* _poolParent, float _timerReturnToPool) : m_poolParent(_poolParent), m_timerReturnToPool(_timerReturnToPool) {};
 	~Pool();
-	TArray<AActor*> ItemPool() { return m_itemPool; }
+	TArray<AActor*>* ItemPool() { return &m_itemPool; }
 };
 
 USTRUCT(BlueprintType)
@@ -50,7 +50,9 @@ public:
 
 	FPoolLeader() { }
 
-	inline TArray<Pool*> SubPools() { return m_subPools; }
+	inline TArray<Pool*>* SubPools() { return &m_subPools; }
+	inline Pool* SubPools(int _index) { return m_subPools[_index]; }
+
 	inline void SetPoolParent(AActor* _poolParent) { m_poolParent = _poolParent; }
 	inline void SetWorld(UWorld* _worldRef) { m_worldRef = _worldRef; }
 
