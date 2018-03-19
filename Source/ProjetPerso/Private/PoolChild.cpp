@@ -32,3 +32,23 @@ void UPoolChild::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// ...
 }
 
+void UPoolChild::ReturnToPool() 
+{
+	AActor* actor = GetOwner();
+
+	// Return to its old parent
+	FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
+	actor->AttachToActor(m_pool->m_poolParent, rules);
+
+	// Hide item
+	UStaticMeshComponent* staticMesh = actor->FindComponentByClass<UStaticMeshComponent>();
+	if (staticMesh == NULL)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No static mesh attached to blueprint."));
+		return;
+	}
+	staticMesh->SetVisibility(false);
+	staticMesh->SetCollisionProfileName(FName("NoCollision"));
+	staticMesh->SetMobility(EComponentMobility::Movable);
+}
+

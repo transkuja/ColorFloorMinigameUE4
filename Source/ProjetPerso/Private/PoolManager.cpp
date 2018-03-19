@@ -69,7 +69,7 @@ void UPoolManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	// ...
 }
 
-Pool::~Pool()
+FPool::~FPool()
 {
 	delete m_poolParent;
 }
@@ -135,7 +135,7 @@ void FPoolLeader::InitializePool()
 			}
 		}
 
-		Pool* newPool = new Pool(poolContainer, m_timerReturnToPool);
+		FPool* newPool = new FPool(poolContainer, m_timerReturnToPool);
 		if (newPool == NULL)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Fail to create pool."));
@@ -143,8 +143,8 @@ void FPoolLeader::InitializePool()
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Pool created."));
 
-		SubPools()->Emplace(new Pool(poolContainer, m_timerReturnToPool));
-		UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools()->Num());
+		SubPools().Emplace(newPool);
+		UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
 
 		for (int j = 0; j < m_poolSize / ((m_separateSpawnablesIntoDifferentPools) ? m_spawnableBlueprints.Num() : 1); j++)
 		{
@@ -193,8 +193,8 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 	*/
 
 	//UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
-
-	SubPools(_subpoolIndex)->ItemPool()->Emplace(item);
-
+	
+	//SubPools(_subpoolIndex)->ItemPool()->Emplace(item);
+	SubPools()[_subpoolIndex]->ItemPool()->Emplace(item);
 	return item;
 }

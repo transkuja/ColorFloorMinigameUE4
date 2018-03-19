@@ -13,7 +13,7 @@ enum class PoolName : uint8 {
 	Collectable UMETA(DisplayName = "Collectable")
 };
 
-class PROJETPERSO_API Pool
+class PROJETPERSO_API FPool
 {
 	TArray<AActor*> m_itemPool;
 
@@ -21,8 +21,8 @@ public:
 	float m_timerReturnToPool = -1;
 	AActor* m_poolParent;
 
-	Pool(AActor* _poolParent, float _timerReturnToPool) : m_poolParent(_poolParent), m_timerReturnToPool(_timerReturnToPool) {};
-	~Pool();
+	FPool(AActor* _poolParent, float _timerReturnToPool) : m_poolParent(_poolParent), m_timerReturnToPool(_timerReturnToPool) {};
+	~FPool();
 	TArray<AActor*>* ItemPool() { return &m_itemPool; }
 };
 
@@ -30,7 +30,7 @@ USTRUCT(BlueprintType)
 struct PROJETPERSO_API FPoolLeader
 {
 	GENERATED_BODY()
-	TArray<Pool*> m_subPools;
+	TArray<FPool*> m_subPools;
 	UWorld* m_worldRef;
 
 protected:
@@ -50,8 +50,8 @@ public:
 
 	FPoolLeader() { }
 
-	inline TArray<Pool*>* SubPools() { return &m_subPools; }
-	inline Pool* SubPools(int _index) { return m_subPools[_index]; }
+	inline TArray<FPool*>& SubPools() { return m_subPools; }
+	inline FPool* SubPools(int _index) { return m_subPools[_index]; }
 
 	inline void SetPoolParent(AActor* _poolParent) { m_poolParent = _poolParent; }
 	inline void SetWorld(UWorld* _worldRef) { m_worldRef = _worldRef; }

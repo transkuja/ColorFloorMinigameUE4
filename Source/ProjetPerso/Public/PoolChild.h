@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PoolChild.generated.h"
+#include "PoolManager.h"
 
+#include "PoolChild.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJETPERSO_API UPoolChild : public UActorComponent
@@ -13,7 +14,7 @@ class PROJETPERSO_API UPoolChild : public UActorComponent
 	GENERATED_BODY()
 
 private:
-	Pool* m_pool;
+	FPool* m_pool;
 	float m_currentTimer = 0.0f;
 	bool m_noReturn = false;
 	bool m_isReady = false;
@@ -21,11 +22,15 @@ private:
 public:	
 	// Sets default values for this component's properties
 	UPoolChild();
-	inline void SetPool(Pool* _pool) { 
+	inline void SetPool(FPool* _pool) { 
 		m_pool = _pool;
 		m_currentTimer = m_pool->m_timerReturnToPool;
 		m_isReady = true;
 	}
+
+	inline FPool* GetPool() { return m_pool; }
+
+	void ReturnToPool();
 
 protected:
 	// Called when the game starts
