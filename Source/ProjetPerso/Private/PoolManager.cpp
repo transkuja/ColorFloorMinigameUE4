@@ -276,10 +276,10 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 {
 	int blueprintIndex = (m_separateSpawnablesIntoDifferentPools) ? _subpoolIndex : rand()% m_spawnableBlueprints.Num();
 	UE_LOG(LogTemp, Warning, TEXT("Index %d"), blueprintIndex);
-	if (m_spawnableBlueprints[blueprintIndex] == nullptr)
-		UE_LOG(LogTemp, Warning, TEXT("nullptr"));
+	//if (m_spawnableBlueprints[blueprintIndex] == nullptr)
+	//	UE_LOG(LogTemp, Warning, TEXT("nullptr"));
 
-	AActor* item = m_worldRef->SpawnActor<AActor>(m_spawnableBlueprints[blueprintIndex]->GetClass(), FVector::ZeroVector, FRotator::ZeroRotator);
+	AActor* item = m_worldRef->SpawnActor<AActor>(m_spawnableBlueprints[blueprintIndex], FVector::ZeroVector, FRotator::ZeroRotator);
 	if (item == nullptr)
 		UE_LOG(LogTemp, Warning, TEXT("nullptr item"));
 

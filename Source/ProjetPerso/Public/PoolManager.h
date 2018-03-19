@@ -41,7 +41,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	int m_poolSize = 50;
 	UPROPERTY(EditAnywhere)
-	TArray<AActor*> m_spawnableBlueprints;
+	TArray<UClass> m_spawnableBlueprints;
 	UPROPERTY(EditAnywhere)
 	bool m_separateSpawnablesIntoDifferentPools = false;
 	UPROPERTY(EditAnywhere)
