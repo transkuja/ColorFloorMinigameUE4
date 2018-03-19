@@ -24,12 +24,17 @@ void UPoolChild::BeginPlay()
 }
 
 
-// Called every frame
 void UPoolChild::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (m_isReady)
+	{
+		if (m_noReturn)
+			return;
 
-	// ...
+		m_currentTimer -= DeltaTime;
+		if (m_currentTimer < 0.0f)
+			ReturnToPool();
+	}
 }
 
 void UPoolChild::ReturnToPool() 
@@ -50,5 +55,14 @@ void UPoolChild::ReturnToPool()
 	staticMesh->SetVisibility(false);
 	staticMesh->SetCollisionProfileName(FName("NoCollision"));
 	staticMesh->SetMobility(EComponentMobility::Movable);
+}
+
+void UPoolChild::ResetItemTimer()
+{
+	if (m_pool != nullptr)
+	{
+		m_currentTimer = m_pool->m_timerReturnToPool;
+		if (m_currentTimer == -1) m_noReturn = true;
+	}
 }
 

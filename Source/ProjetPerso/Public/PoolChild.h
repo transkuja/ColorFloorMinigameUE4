@@ -25,12 +25,17 @@ public:
 	inline void SetPool(FPool* _pool) { 
 		m_pool = _pool;
 		m_currentTimer = m_pool->m_timerReturnToPool;
+		if (m_currentTimer < 0.0f)
+			m_noReturn = true;
 		m_isReady = true;
 	}
 
 	inline FPool* GetPool() { return m_pool; }
 
+	UFUNCTION(BlueprintCallable)
 	void ReturnToPool();
+
+	void ResetItemTimer();
 
 protected:
 	// Called when the game starts

@@ -33,10 +33,9 @@ struct PROJETPERSO_API FPoolLeader
 	TArray<FPool*> m_subPools;
 	UWorld* m_worldRef;
 
-protected:
+public:
 	AActor* m_poolParent;
 
-public:
 	UPROPERTY(EditAnywhere)
 	PoolName m_poolName;
 	UPROPERTY(EditAnywhere)
@@ -49,6 +48,7 @@ public:
 	float m_timerReturnToPool = -1;
 
 	FPoolLeader() { }
+	FPoolLeader(FPoolLeader* _toCopy);
 
 	inline TArray<FPool*>& SubPools() { return m_subPools; }
 	inline FPool* SubPools(int _index) { return m_subPools[_index]; }
@@ -56,11 +56,22 @@ public:
 	inline void SetPoolParent(AActor* _poolParent) { m_poolParent = _poolParent; }
 	inline void SetWorld(UWorld* _worldRef) { m_worldRef = _worldRef; }
 
-	AActor* GetItem(bool _activeObjectOnRetrieval = false, int _subpoolNumber = 0);
-	AActor* GetItem(AActor* _newParent, FVector _newPosition, bool _activeObjectOnRetrieval = false, bool _spawnInWorldspace = false, int _subpoolNumber = 0);
 	void InitializePool();
 	AActor* CreateRandomPoolItem(int _subpoolIndex);
 };
+
+//UCLASS(BlueprintType)
+//class PROJETPERSO_API UPoolLeaderClass : public UObject
+//{
+//	GENERATED_BODY()
+//
+//public:
+//
+//	UFUNCTION(BlueprintCallable)
+//	AActor* GetItem(FPoolLeader _poolLeaderData, bool _activeObjectOnRetrieval = false, int _subpoolNumber = 0);
+//	UFUNCTION(BlueprintCallable)
+//	AActor* GetItem2(AActor* _newParent, FVector _newPosition, bool _activeObjectOnRetrieval = false, bool _spawnInWorldspace = false, int _subpoolNumber = 0);
+//};
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJETPERSO_API UPoolManager : public UActorComponent
@@ -73,11 +84,20 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FPoolLeader> m_poolLeaders;
+
+	//UPROPERTY(BlueprintReadOnly)
+	//UPoolLeaderClass* leaderClass;
 	//UPROPERTY(EditAnywhere)
 	//	TArray<int> test;
 	//UPROPERTY(EditAnywhere)
 	//	float test2;
-	FPoolLeader GetPoolByName(PoolName _poolName);
+	//UFUNCTION(BlueprintCallable)
+	int GetPoolByName(PoolName _poolName);
+
+	UFUNCTION(BlueprintCallable)
+	AActor* GetItem(PoolName _poolName, bool _activeObjectOnRetrieval = false, int _subpoolNumber = 0);
+	UFUNCTION(BlueprintCallable)
+	AActor* GetItemEnhanced(PoolName _poolName, AActor* _newParent, FVector _newPosition, FName _newCollisionProfile = FName("BlockAll"), bool _activeObjectOnRetrieval = false, bool _spawnInWorldspace = false, int _subpoolNumber = 0);
 
 protected:
 	// Called when the game starts
