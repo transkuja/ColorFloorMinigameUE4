@@ -5,6 +5,12 @@
 
 class AEmptyActor;
 
+
+FPool::~FPool()
+{
+	delete m_poolParent;
+}
+
 // Sets default values for this component's properties
 UPoolManager::UPoolManager()
 {
@@ -15,6 +21,7 @@ UPoolManager::UPoolManager()
 	// ...	
 }
 
+// Get enum value name
 FName GetPoolNameAsString(PoolName EnumValue)
 {
 	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("PoolName"), true);
@@ -23,7 +30,6 @@ FName GetPoolNameAsString(PoolName EnumValue)
 	return EnumPtr->GetNameByValue((int64)EnumValue);
 }
 
-// Called when the game starts
 void UPoolManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -71,10 +77,6 @@ void UPoolManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	// ...
 }
 
-FPool::~FPool()
-{
-	delete m_poolParent;
-}
 
 AActor* UPoolManager::GetItem(PoolName _poolName, bool _activeObjectOnRetrieval, int _subpoolNumber)
 {
@@ -185,11 +187,6 @@ AActor * UPoolManager::GetItemEnhanced(PoolName _poolName, AActor * _newParent, 
 
 	return actorToReturn;
 }
-
-//AActor* UPoolLeaderClass::GetItem2(AActor * _newParent, FVector _newPosition, bool _activeObjectOnRetrieval, bool _spawnInWorldspace, int _subpoolNumber)
-//{
-//	return nullptr;
-//}
 
 FPoolLeader::FPoolLeader(FPoolLeader* _toCopy)
 {
