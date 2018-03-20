@@ -131,7 +131,7 @@ AActor * UPoolManager::GetItemEnhanced(PoolName _poolName, AActor * _newParent, 
 	AActor* actorToReturn;
 	TArray<AActor*> poolParentChildren;
 	int leaderDataIndex = GetPoolByName(_poolName);
-
+	
 	if (m_poolLeaders[leaderDataIndex].m_poolParent == NULL)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No pool parent"));
@@ -139,20 +139,28 @@ AActor * UPoolManager::GetItemEnhanced(PoolName _poolName, AActor * _newParent, 
 	}
 
 	m_poolLeaders[leaderDataIndex].m_poolParent->GetAttachedActors(poolParentChildren);
-	if (poolParentChildren.Num() == 0)
+	TArray<AActor*> poolChildren;
+	poolParentChildren[_subpoolNumber]->GetAttachedActors(poolChildren);
+
+	if (poolChildren.Num() == 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("No more items"));
 		actorToReturn = m_poolLeaders[leaderDataIndex].CreateRandomPoolItem(_subpoolNumber);
 	}
 	else
 	{
-		TArray<AActor*> poolChildren;
-		poolParentChildren[_subpoolNumber]->GetAttachedActors(poolChildren);
 		actorToReturn = poolChildren[0];
 	}
 
 	if (actorToReturn == NULL)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Actor to return null"));
+		return nullptr;
+	}
+
+	if (actorToReturn->FindComponentByClass<UPoolChild>() == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pool child null"));
 		return nullptr;
 	}
 
