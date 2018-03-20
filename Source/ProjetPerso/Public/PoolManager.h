@@ -45,7 +45,7 @@ public:
 	int m_poolSize = 50;
 	// The items to spawn
 	UPROPERTY(EditAnywhere)
-	TArray<UClass> m_spawnableBlueprints;
+	TArray<UClass*> m_spawnableBlueprints;
 
 	// If true, creates a subpool for each spawnable blueprint. Else, every spawnable blueprints will be attached to a single subpool.
 	UPROPERTY(EditAnywhere)
