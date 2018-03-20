@@ -276,8 +276,6 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 {
 	int blueprintIndex = (m_separateSpawnablesIntoDifferentPools) ? _subpoolIndex : rand()% m_spawnableBlueprints.Num();
 	UE_LOG(LogTemp, Warning, TEXT("Index %d"), blueprintIndex);
-	//if (m_spawnableBlueprints[blueprintIndex] == nullptr)
-	//	UE_LOG(LogTemp, Warning, TEXT("nullptr"));
 
 	AActor* item = m_worldRef->SpawnActor<AActor>(m_spawnableBlueprints[blueprintIndex], FVector::ZeroVector, FRotator::ZeroRotator);
 	if (item == nullptr)
@@ -303,17 +301,6 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 	// Check this later
 	// UPoolChild* poolChildComponent = item->CreateDefaultSubobject<UPoolChild>(TEXT("PoolChild")); // Only use this in constructors
 
-	/*
-	UPoolChild* poolChildComponent = ConstructObject<UPoolChild>(UPoolChild::StaticClass(), item, TEXT("PoolChild"));
-
-	poolChildComponent->RegisterComponent();
-	poolChildComponent->OnComponentCreated(); // Might need this line, might not.
-	poolChildComponent->AttachTo(item->GetRootComponent(), NAME_None);
-	*/
-
-	//UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
-	
-	//SubPools(_subpoolIndex)->ItemPool()->Emplace(item);
 	SubPools()[_subpoolIndex]->ItemPool()->Emplace(item);
 	return item;
 }

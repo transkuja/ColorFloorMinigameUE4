@@ -60,38 +60,17 @@ public:
 	AActor* CreateRandomPoolItem(int _subpoolIndex);
 };
 
-//UCLASS(BlueprintType)
-//class PROJETPERSO_API UPoolLeaderClass : public UObject
-//{
-//	GENERATED_BODY()
-//
-//public:
-//
-//	UFUNCTION(BlueprintCallable)
-//	AActor* GetItem(FPoolLeader _poolLeaderData, bool _activeObjectOnRetrieval = false, int _subpoolNumber = 0);
-//	UFUNCTION(BlueprintCallable)
-//	AActor* GetItem2(AActor* _newParent, FVector _newPosition, bool _activeObjectOnRetrieval = false, bool _spawnInWorldspace = false, int _subpoolNumber = 0);
-//};
-
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJETPERSO_API UPoolManager : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	UPoolManager();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FPoolLeader> m_poolLeaders;
 
-	//UPROPERTY(BlueprintReadOnly)
-	//UPoolLeaderClass* leaderClass;
-	//UPROPERTY(EditAnywhere)
-	//	TArray<int> test;
-	//UPROPERTY(EditAnywhere)
-	//	float test2;
-	//UFUNCTION(BlueprintCallable)
 	int GetPoolByName(PoolName _poolName);
 
 	UFUNCTION(BlueprintCallable)
@@ -100,13 +79,10 @@ public:
 	AActor* GetItemEnhanced(PoolName _poolName, AActor* _newParent, FVector _newPosition, FName _newCollisionProfile = FName("BlockAll"), bool _activeObjectOnRetrieval = false, bool _spawnInWorldspace = false, int _subpoolNumber = 0);
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 
 
 };
