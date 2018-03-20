@@ -14,14 +14,18 @@ class PROJETPERSO_API UPoolChild : public UActorComponent
 	GENERATED_BODY()
 
 private:
+	// The pool from which this item comes from
 	FPool* m_pool;
 	float m_currentTimer = 0.0f;
+	// If true, the item returns to the pool only if ReturnToPool is called.
 	bool m_noReturn = false;
+	// Used 
 	bool m_isReady = false;
 
 public:	
-	// Sets default values for this component's properties
 	UPoolChild();
+
+	// Sets default values for this component's properties
 	inline void SetPool(FPool* _pool) { 
 		m_pool = _pool;
 		m_currentTimer = m_pool->m_timerReturnToPool;
@@ -32,9 +36,15 @@ public:
 
 	inline FPool* GetPool() { return m_pool; }
 
+	/*
+		Send the item back to the pool it comes from, deactivating it.
+	*/
 	UFUNCTION(BlueprintCallable)
 	void ReturnToPool();
 
+	/*
+		Reset the item. Should be called when the item becomes active in scene (after retrieval).
+	*/
 	void ResetItemTimer();
 
 protected:

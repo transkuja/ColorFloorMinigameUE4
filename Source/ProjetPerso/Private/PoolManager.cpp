@@ -11,14 +11,9 @@ FPool::~FPool()
 	delete m_poolParent;
 }
 
-// Sets default values for this component's properties
 UPoolManager::UPoolManager()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...	
 }
 
 // Get enum value name
@@ -40,22 +35,32 @@ void UPoolManager::BeginPlay()
 		return;
 	}
 
+	// For each leader, create tree view then initialize associated Pool
 	for (int i = 0; i < m_poolLeaders.Num(); ++i)
 	{
 		FActorSpawnParameters spawnParam;
 		spawnParam.Name = GetPoolNameAsString(m_poolLeaders[i].m_poolName);
+
+		// Create an empty actor for Pool Parent, and rename it with pool name.
 		AEmptyActor* poolParent = GetWorld()->SpawnActor<AEmptyActor>(AEmptyActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
 		poolParent->Rename(*(GetPoolNameAsString(m_poolLeaders[i].m_poolName).ToString()));
 		poolParent->SetActorLabel(*(GetPoolNameAsString(m_poolLeaders[i].m_poolName).ToString()));
 
+		// Attach pool parent to PoolManager.
 		FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
 		poolParent->AttachToActor(GetOwner(), rules);
+
+		// Set pool parent to pool leader and initialize pool.
 		m_poolLeaders[i].SetPoolParent(poolParent);
 		m_poolLeaders[i].SetWorld(GetWorld());
 		m_poolLeaders[i].InitializePool();
 	}
-	// ...
-	
+}
+
+
+void UPoolManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
 int UPoolManager::GetPoolByName(PoolName _poolName)
@@ -69,19 +74,11 @@ int UPoolManager::GetPoolByName(PoolName _poolName)
 	return 0;
 }
 
-// Called every frame
-void UPoolManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
-
 AActor* UPoolManager::GetItem(PoolName _poolName, bool _activeObjectOnRetrieval, int _subpoolNumber)
 {
 	AActor* actorToReturn;
-	TArray<AActor*> poolParentChildren;
+
+	// Get the leader index from pool name
 	int leaderDataIndex = GetPoolByName(_poolName);
 
 	if (m_poolLeaders[leaderDataIndex].m_poolParent == NULL)
@@ -90,15 +87,21 @@ AActor* UPoolManager::GetItem(PoolName _poolName, bool _activeObjectOnRetrieval,
 		return nullptr;
 	}
 
+	// Retrieve subpools
+	TArray<AActor*> poolParentChildren;
 	m_poolLeaders[leaderDataIndex].m_poolParent->GetAttachedActors(poolParentChildren);
-	if (poolParentChildren.Num() == 0)
+
+	// Retrieve items from subpool
+	TArray<AActor*> poolChildren;
+	poolParentChildren[_subpoolNumber]->GetAttachedActors(poolChildren);
+
+	// If there's no more item in pool, create a new one. Else, return the first one.
+	if (poolChildren.Num() == 0)
 	{
 		actorToReturn = m_poolLeaders[leaderDataIndex].CreateRandomPoolItem(_subpoolNumber);
 	}
 	else
 	{
-		TArray<AActor*> poolChildren;
-		poolParentChildren[_subpoolNumber]->GetAttachedActors(poolChildren);
 		actorToReturn = poolChildren[0];
 	}
 
@@ -108,8 +111,10 @@ AActor* UPoolManager::GetItem(PoolName _poolName, bool _activeObjectOnRetrieval,
 		return nullptr;
 	}
 
+	// Initialize item
 	actorToReturn->FindComponentByClass<UPoolChild>()->ResetItemTimer();
 
+	// Detach item from pool, then show it and change its collisions
 	actorToReturn->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
 	if (_activeObjectOnRetrieval)
 	{
@@ -129,7 +134,8 @@ AActor* UPoolManager::GetItem(PoolName _poolName, bool _activeObjectOnRetrieval,
 AActor * UPoolManager::GetItemEnhanced(PoolName _poolName, AActor * _newParent, FVector _newPosition, FName _newCollisionProfile, bool _activeObjectOnRetrieval, bool _spawnInWorldspace, int _subpoolNumber)
 {
 	AActor* actorToReturn;
-	TArray<AActor*> poolParentChildren;
+
+	// Get the leader index from pool name
 	int leaderDataIndex = GetPoolByName(_poolName);
 	
 	if (m_poolLeaders[leaderDataIndex].m_poolParent == NULL)
@@ -138,13 +144,18 @@ AActor * UPoolManager::GetItemEnhanced(PoolName _poolName, AActor * _newParent, 
 		return nullptr;
 	}
 
+	// Retrieve subpools
+	TArray<AActor*> poolParentChildren;
 	m_poolLeaders[leaderDataIndex].m_poolParent->GetAttachedActors(poolParentChildren);
+
+	// Retrieve items from subpool
 	TArray<AActor*> poolChildren;
 	poolParentChildren[_subpoolNumber]->GetAttachedActors(poolChildren);
 
+
+	// If there's no more item in pool, create a new one. Else, return the first one.
 	if (poolChildren.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No more items"));
 		actorToReturn = m_poolLeaders[leaderDataIndex].CreateRandomPoolItem(_subpoolNumber);
 	}
 	else
@@ -164,23 +175,26 @@ AActor * UPoolManager::GetItemEnhanced(PoolName _poolName, AActor * _newParent, 
 		return nullptr;
 	}
 
+	// Initialize item
 	actorToReturn->FindComponentByClass<UPoolChild>()->ResetItemTimer();
 
+	// If _newParent is specified, attach the item to the specified actor.
 	if (_newParent != nullptr)
 		actorToReturn->AttachToActor(_newParent, FAttachmentTransformRules::KeepWorldTransform);
 	else
 		actorToReturn->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
 
+	// If _spawnInWorldSpace, set actor location to _newPosition in world space. Else, set actor relative location to _newPosition.
 	if (_spawnInWorldspace)
 	{
 		actorToReturn->SetActorLocation(_newPosition);
-		//actorToReturn->SetActorRotation(_newRotation);
 	}
 	else
 	{
 		actorToReturn->SetActorRelativeLocation(_newPosition);
 	}
 
+	// If _activeObjectOnRetrieval, change item visibility and collision profile.
 	if (_activeObjectOnRetrieval)
 	{
 		UStaticMeshComponent* staticMesh = actorToReturn->FindComponentByClass<UStaticMeshComponent>();
@@ -223,11 +237,15 @@ void FPoolLeader::InitializePool()
 	}
 
 	TArray<AActor*> children;
+
+	// Either fill a subpool with random items from m_spawnableBlueprints, or fill a subpool for each blueprint in m_spawnableBlueprints
 	for (int i = 0; i < ((m_separateSpawnablesIntoDifferentPools) ? m_spawnableBlueprints.Num() : 1); i++)
 	{
+		// Retrieve subpools
 		m_poolParent->GetAttachedActors(children);
 		AEmptyActor* poolContainer = NULL;
 
+		// Create a Pool Container for each subpools if not already existing
 		if (children.Num() <= i)
 		{
 			if (m_worldRef == NULL)
@@ -236,16 +254,19 @@ void FPoolLeader::InitializePool()
 				return;
 			}
 
+			// Create the subpool container with proper name
 			poolContainer = m_worldRef->SpawnActor<AEmptyActor>(AEmptyActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 			FString poolContainerName = FString("Pool Container ");
 			poolContainerName.AppendInt(i);
 			poolContainer->Rename(*poolContainerName);
 			poolContainer->SetActorLabel(*poolContainerName);
 
+			// Attach the subpool to pool parent
 			FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
 			poolContainer->AttachToActor(m_poolParent, rules);
 		}
 
+		// Retrieve the subpool i if was created before function's call.
 		if (poolContainer == NULL)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Null pool container, retrieve it from children..."));
@@ -259,17 +280,18 @@ void FPoolLeader::InitializePool()
 			}
 		}
 
+		// Create a new pool linked to pool container
 		FPool* newPool = new FPool(poolContainer, m_timerReturnToPool);
 		if (newPool == NULL)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Fail to create pool."));
 			return;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Pool created."));
 
+		// Link pool reference to leader
 		SubPools().Emplace(newPool);
-		UE_LOG(LogTemp, Warning, TEXT("Sub pool size %d."), SubPools().Num());
 
+		// Fill the current pool
 		for (int j = 0; j < m_poolSize / ((m_separateSpawnablesIntoDifferentPools) ? m_spawnableBlueprints.Num() : 1); j++)
 		{
 			CreateRandomPoolItem(i);
@@ -279,13 +301,14 @@ void FPoolLeader::InitializePool()
 
 AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 {
+	// If m_separateSpawnablesIntoDifferentPools option, create m_poolSize times the same item. Else, create a random item from m_spawnableBlueprints.
 	int blueprintIndex = (m_separateSpawnablesIntoDifferentPools) ? _subpoolIndex : rand()% m_spawnableBlueprints.Num();
-	UE_LOG(LogTemp, Warning, TEXT("Index %d"), blueprintIndex);
 
 	AActor* item = m_worldRef->SpawnActor<AActor>(m_spawnableBlueprints[blueprintIndex], FVector::ZeroVector, FRotator::ZeroRotator);
 	if (item == nullptr)
 		UE_LOG(LogTemp, Warning, TEXT("nullptr item"));
 
+	// Hide item when created
 	UStaticMeshComponent* staticMesh = item->FindComponentByClass<UStaticMeshComponent>();
 	if (staticMesh == NULL)
 	{
@@ -295,17 +318,26 @@ AActor* FPoolLeader::CreateRandomPoolItem(int _subpoolIndex)
 
 	staticMesh->SetVisibility(false);
 	staticMesh->SetCollisionProfileName(FName("NoCollision"));
+
+	// Set mobility to movable (important to set the item position later)
 	staticMesh->SetMobility(EComponentMobility::Movable);
 
+	// Get subpools to attach the new item to the proper one.
 	TArray<AActor*> children;
 	m_poolParent->GetAttachedActors(children);
+
+	// Attach the item to subpool
 	FAttachmentTransformRules rules = { EAttachmentRule::KeepRelative, false };
 	item->AttachToActor(children[_subpoolIndex], rules);
+	// TODO: would be better if we add dynamically the pool child component
+	// Initialize PoolChild component
 	item->FindComponentByClass<UPoolChild>()->SetPool(SubPools(_subpoolIndex));
 
+	
 	// Check this later
 	// UPoolChild* poolChildComponent = item->CreateDefaultSubobject<UPoolChild>(TEXT("PoolChild")); // Only use this in constructors
 
+	// Save the item reference
 	SubPools()[_subpoolIndex]->ItemPool()->Emplace(item);
 	return item;
 }

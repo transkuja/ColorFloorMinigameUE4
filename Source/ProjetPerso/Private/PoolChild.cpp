@@ -3,34 +3,26 @@
 #include "PoolChild.h"
 
 
-// Sets default values for this component's properties
 UPoolChild::UPoolChild()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
-
-// Called when the game starts
 void UPoolChild::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
-
 
 void UPoolChild::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	// If the item has received its Pool data, start the timer
 	if (m_isReady)
 	{
+		// Ignore timer if we don't want it
 		if (m_noReturn)
 			return;
 
+		// Send the item back to its pool after m_currentTimer expires
 		m_currentTimer -= DeltaTime;
 		if (m_currentTimer < 0.0f)
 			ReturnToPool();
@@ -61,6 +53,7 @@ void UPoolChild::ResetItemTimer()
 {
 	if (m_pool != nullptr)
 	{
+		// Reset timer for next retrieval
 		m_currentTimer = m_pool->m_timerReturnToPool;
 		if (m_currentTimer == -1) m_noReturn = true;
 	}
